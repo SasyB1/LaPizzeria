@@ -9,7 +9,7 @@ namespace LaPizzeria.Models
         public int IngredientId { get; set; }
         [Required]
         public string IngredientName { get; set; }
-        [Required]
+        
         public List<Product> Products { get; set; } = [];
     }
 }
