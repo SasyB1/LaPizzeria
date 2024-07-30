@@ -21,23 +21,24 @@ namespace LaPizzeria.Controllers
             return View();
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register([Bind("Username,Password")] RegisterDTO user)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(user);
-            }
-            _context.Users.Add(new User
-            {
-                Username = user.Username,
-                Password = user.Password,
-                Role = user.Role
-            });
-            await _context.SaveChangesAsync();
-            return RedirectToAction("Login");
-        }
+      [HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> Register([Bind("Username,Password,Role")] RegisterDTO user)
+{
+    if (!ModelState.IsValid)
+    {
+        return View(user);
+    }
+    _context.Users.Add(new User
+    {
+        Username = user.Username,
+        Password = user.Password,
+        Role = user.Role
+    });
+    await _context.SaveChangesAsync();
+    return RedirectToAction("Login");
+}
+
 
         public IActionResult Login()
         {
