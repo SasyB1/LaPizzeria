@@ -88,20 +88,6 @@ namespace LaPizzeria.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateProduct(int id, Product product, IFormFile productImage)
         {
-            if (productImage != null && productImage.Length > 0)
-            {
-                using (var memoryStream = new MemoryStream())
-                {
-                    await productImage.CopyToAsync(memoryStream);
-                    product.ProductImage = memoryStream.ToArray();
-                }
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return View(product);
-            }
-
             var productToUpdate = await _context.Products
                 .Include(p => p.Ingredients)
                 .FirstOrDefaultAsync(p => p.ProductId == id);
@@ -110,7 +96,19 @@ namespace LaPizzeria.Controllers
             {
                 return NotFound();
             }
-
+            if (productImage != null && productImage.Length > 0)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await productImage.CopyToAsync(memoryStream);
+                    productToUpdate.ProductImage = memoryStream.ToArray();
+                }
+            }
+            else if (productToUpdate.ProductImage == null)
+            {
+                ModelState.AddModelError("ProductImage", "ProductImage is required.");
+                return View(productToUpdate);
+            }
             productToUpdate.ProductName = product.ProductName;
             productToUpdate.Description = product.Description;
             productToUpdate.ProductPrice = product.ProductPrice;
@@ -125,7 +123,6 @@ namespace LaPizzeria.Controllers
                     IngredientName = ingredient.IngredientName
                 });
             }
-
             await _context.SaveChangesAsync();
 
             return RedirectToAction("AllProducts");
