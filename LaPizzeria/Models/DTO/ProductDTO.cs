@@ -17,6 +17,6 @@ namespace LaPizzeria.Models.DTO
        
         public int ProductDeliveryTime { get; set; }
 
-        public List<Ingredient> Ingredients { get; set; } = [];
+        public List<IngredientDTO> Ingredients { get; set; } = new List<IngredientDTO>();
     }
 }
