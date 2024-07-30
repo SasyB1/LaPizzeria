@@ -23,6 +23,11 @@ namespace LaPizzeria.Controllers
             return View();
         }
 
+        public IActionResult Orders()
+        {
+            return View();
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddProduct([Bind("ProductName,ProductImage,Description,ProductPrice,ProductDeliveryTime,Ingredients")] ProductDTO productDto)
