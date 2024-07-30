@@ -113,16 +113,6 @@ namespace LaPizzeria.Controllers
             productToUpdate.Description = product.Description;
             productToUpdate.ProductPrice = product.ProductPrice;
             productToUpdate.ProductDeliveryTime = product.ProductDeliveryTime;
-
-            _context.Entry(productToUpdate).Collection(p => p.Ingredients).Load();
-            productToUpdate.Ingredients.Clear();
-            foreach (var ingredient in product.Ingredients)
-            {
-                productToUpdate.Ingredients.Add(new Ingredient
-                {
-                    IngredientName = ingredient.IngredientName
-                });
-            }
             await _context.SaveChangesAsync();
 
             return RedirectToAction("AllProducts");
