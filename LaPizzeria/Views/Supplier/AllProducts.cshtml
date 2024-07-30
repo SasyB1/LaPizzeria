@@ -64,9 +64,21 @@
                 </td>
                 <td>
                     <a asp-action="UpdateProduct" asp-route-id="@item.ProductId" class="btn btn-primary">Update</a>
-                    <a asp-action="DeleteProduct" asp-route-id="@item.ProductId" class="btn btn-danger">Delete</a>
+                    <form asp-action="DeleteProduct" asp-route-id="@item.ProductId" method="post" style="display:inline;" onsubmit="confirmDelete(event);">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+@section Scripts {
+    <script type="text/javascript">
+        function confirmDelete(event) {
+            if (!confirm('Sei sicuro di voler eliminare questo prodotto?')) {
+                event.preventDefault();
+            }
+        }
+    </script>
+}

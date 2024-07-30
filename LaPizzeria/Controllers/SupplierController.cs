@@ -116,7 +116,7 @@ namespace LaPizzeria.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction("AllProducts");
-        }
+        } 
 
         [HttpPost]
         [ValidateAntiForgeryToken]
