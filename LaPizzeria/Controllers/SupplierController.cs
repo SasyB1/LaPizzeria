@@ -13,9 +13,11 @@ namespace LaPizzeria.Controllers
         {
             _context = context;
         }
-        public IActionResult Products()
+
+        public async Task<IActionResult> AllProducts()
         {
-            return View();
+            var products = await _context.Products.Include(p => p.Ingredients).ToListAsync();
+            return View(products);
         }
 
         public IActionResult Ingredients()
@@ -28,19 +30,32 @@ namespace LaPizzeria.Controllers
             return View();
         }
 
+        public IActionResult AddProduct()
+        {
+            return View();
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddProduct([Bind("ProductName,ProductImage,Description,ProductPrice,ProductDeliveryTime,Ingredients")] ProductDTO productDto)
+        public async Task<IActionResult> AddProduct(ProductDTO productDto, IFormFile productImage)
         {
-            if (!ModelState.IsValid)
+            if (productImage == null || productImage.Length == 0)
             {
+                ModelState.AddModelError("ProductImage", "ProductImage is required.");
                 return View(productDto);
+            }
+
+            byte[] imageBytes;
+            using (var memoryStream = new MemoryStream())
+            {
+                await productImage.CopyToAsync(memoryStream);
+                imageBytes = memoryStream.ToArray();
             }
 
             var product = new Product
             {
                 ProductName = productDto.ProductName,
-                ProductImage = productDto.ProductImage,
+                ProductImage = imageBytes,
                 Description = productDto.Description,
                 ProductPrice = productDto.ProductPrice,
                 ProductDeliveryTime = productDto.ProductDeliveryTime,
@@ -52,52 +67,77 @@ namespace LaPizzeria.Controllers
 
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
-            return RedirectToAction("Products");
+            return RedirectToAction("AllProducts");
+        }
+
+        public async Task<IActionResult> UpdateProduct(int id)
+        {
+            var product = await _context.Products
+                .Include(p => p.Ingredients)
+                .FirstOrDefaultAsync(p => p.ProductId == id);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            return View(product);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateProduct([Bind("ProductName,ProductImage,Description,ProductPrice,ProductDeliveryTime,Ingredients")] ProductDTO productDto)
+        public async Task<IActionResult> UpdateProduct(int id, Product product, IFormFile productImage)
         {
+            if (productImage != null && productImage.Length > 0)
+            {
+                using (var memoryStream = new MemoryStream())
+                {
+                    await productImage.CopyToAsync(memoryStream);
+                    product.ProductImage = memoryStream.ToArray();
+                }
+            }
+
             if (!ModelState.IsValid)
             {
-                return View(productDto);
+                return View(product);
             }
 
             var productToUpdate = await _context.Products
                 .Include(p => p.Ingredients)
-                .FirstOrDefaultAsync(p => p.ProductName == productDto.ProductName);
+                .FirstOrDefaultAsync(p => p.ProductId == id);
 
             if (productToUpdate == null)
             {
                 return NotFound();
             }
 
-            productToUpdate.ProductImage = productDto.ProductImage;
-            productToUpdate.Description = productDto.Description;
-            productToUpdate.ProductPrice = productDto.ProductPrice;
-            productToUpdate.ProductDeliveryTime = productDto.ProductDeliveryTime;
-            productToUpdate.Ingredients = productDto.Ingredients.Select(i => new Ingredient
+            productToUpdate.ProductName = product.ProductName;
+            productToUpdate.Description = product.Description;
+            productToUpdate.ProductPrice = product.ProductPrice;
+            productToUpdate.ProductDeliveryTime = product.ProductDeliveryTime;
+
+            _context.Entry(productToUpdate).Collection(p => p.Ingredients).Load();
+            productToUpdate.Ingredients.Clear();
+            foreach (var ingredient in product.Ingredients)
             {
-                IngredientName = i.IngredientName
-            }).ToList();
+                productToUpdate.Ingredients.Add(new Ingredient
+                {
+                    IngredientName = ingredient.IngredientName
+                });
+            }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction("Products");
+
+            return RedirectToAction("AllProducts");
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteProduct([Bind("ProductName")] ProductDTO productDto)
+        public async Task<IActionResult> DeleteProduct(int id)
         {
-            if (!ModelState.IsValid)
-            {
-                return View(productDto);
-            }
-
             var productToDelete = await _context.Products
                 .Include(p => p.Ingredients)
-                .FirstOrDefaultAsync(p => p.ProductName == productDto.ProductName);
+                .FirstOrDefaultAsync(p => p.ProductId == id);
 
             if (productToDelete == null)
             {
@@ -106,7 +146,12 @@ namespace LaPizzeria.Controllers
 
             _context.Products.Remove(productToDelete);
             await _context.SaveChangesAsync();
-            return RedirectToAction("Products");
+            return RedirectToAction("AllProducts");
+        }
+
+        public IActionResult AddIngredient()
+        {
+            return View();
         }
 
         [HttpPost]
@@ -125,9 +170,13 @@ namespace LaPizzeria.Controllers
 
             _context.Ingredients.Add(ingredient);
             await _context.SaveChangesAsync();
-            return RedirectToAction("Ingredient");
+            return RedirectToAction("Ingredients");
         }
 
+        public IActionResult UpdateIngredient()
+        {
+            return View();
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -149,9 +198,13 @@ namespace LaPizzeria.Controllers
             ingredientToUpdate.IngredientName = ingredientDto.IngredientName;
             _context.Ingredients.Update(ingredientToUpdate);
             await _context.SaveChangesAsync();
-            return RedirectToAction("Ingredient");
+            return RedirectToAction("Ingredients");
         }
 
+        public IActionResult DeleteIngredient()
+        {
+            return View();
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -172,9 +225,7 @@ namespace LaPizzeria.Controllers
 
             _context.Ingredients.Remove(ingredientToDelete);
             await _context.SaveChangesAsync();
-            return RedirectToAction("Ingredient");
+            return RedirectToAction("Ingredients");
         }
-
-
     }
 }

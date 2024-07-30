@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LaPizzeria.Migrations
 {
     [DbContext(typeof(InFornoDbContext))]
-    [Migration("20240730133457_InizioPizzeria")]
+    [Migration("20240730160932_InizioPizzeria")]
     partial class InizioPizzeria
     {
         /// <inheritdoc />
@@ -40,30 +40,6 @@ namespace LaPizzeria.Migrations
                     b.ToTable("IngredientProduct");
                 });
 
-            modelBuilder.Entity("LaPizzeria.Models.Checkout", b =>
-                {
-                    b.Property<int>("CheckoutId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CheckoutId"));
-
-                    b.Property<string>("Address")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("DateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Note")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("CheckoutId");
-
-                    b.ToTable("Checkouts");
-                });
-
             modelBuilder.Entity("LaPizzeria.Models.Ingredient", b =>
                 {
                     b.Property<int>("IngredientId")
@@ -89,7 +65,36 @@ namespace LaPizzeria.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"));
 
-                    b.Property<int?>("CheckoutId")
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("DateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Note")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("OrderId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Checkouts");
+                });
+
+            modelBuilder.Entity("LaPizzeria.Models.OrderItem", b =>
+                {
+                    b.Property<int>("OrderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"));
+
+                    b.Property<int>("OrderId1")
                         .HasColumnType("int");
 
                     b.Property<int>("ProductId")
@@ -98,16 +103,11 @@ namespace LaPizzeria.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("OrderId");
 
-                    b.HasIndex("CheckoutId");
+                    b.HasIndex("OrderId1");
 
                     b.HasIndex("ProductId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Orders");
                 });
@@ -129,8 +129,7 @@ namespace LaPizzeria.Migrations
 
                     b.Property<byte[]>("ProductImage")
                         .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("varbinary(128)");
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("ProductName")
                         .IsRequired()
@@ -138,8 +137,7 @@ namespace LaPizzeria.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<decimal>("ProductPrice")
-                        .HasPrecision(2)
-                        .HasColumnType("decimal(2,2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("ProductId");
 
@@ -161,7 +159,8 @@ namespace LaPizzeria.Migrations
 
                     b.Property<string>("Role")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -190,9 +189,22 @@ namespace LaPizzeria.Migrations
 
             modelBuilder.Entity("LaPizzeria.Models.Order", b =>
                 {
-                    b.HasOne("LaPizzeria.Models.Checkout", null)
-                        .WithMany("Orders")
-                        .HasForeignKey("CheckoutId");
+                    b.HasOne("LaPizzeria.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LaPizzeria.Models.OrderItem", b =>
+                {
+                    b.HasOne("LaPizzeria.Models.Order", null)
+                        .WithMany("OrderItems")
+                        .HasForeignKey("OrderId1")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("LaPizzeria.Models.Product", "Product")
                         .WithMany()
@@ -200,20 +212,12 @@ namespace LaPizzeria.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LaPizzeria.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("Product");
-
-                    b.Navigation("User");
                 });
 
-            modelBuilder.Entity("LaPizzeria.Models.Checkout", b =>
+            modelBuilder.Entity("LaPizzeria.Models.Order", b =>
                 {
-                    b.Navigation("Orders");
+                    b.Navigation("OrderItems");
                 });
 #pragma warning restore 612, 618
         }

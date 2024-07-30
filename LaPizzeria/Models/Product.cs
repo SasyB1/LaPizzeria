@@ -13,14 +13,14 @@ namespace LaPizzeria.Models
         [StringLength(50)]
         public string ProductName { get; set; }
 
-        [Required, StringLength(128)]
+        [Required]
         public byte[] ProductImage { get; set; }
 
         [Required]
         public string Description { get; set; }
 
-        [Range(0, 100)]
-        [Precision(2)]
+        [Required]
+        [Range(0, 1000000)]        
         public decimal ProductPrice { get; set; }
 
         [Required]
@@ -29,6 +29,8 @@ namespace LaPizzeria.Models
 
         [Required]
         public List<Ingredient> Ingredients { get; set; } = [];
+
+        public string ProductImageUrl => ProductImage != null ? $"data:image/jpeg;base64,{Convert.ToBase64String(ProductImage)}" : null;
 
     }
 }

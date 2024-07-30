@@ -1,0 +1,72 @@
+﻿@model IEnumerable<LaPizzeria.Models.Product>
+
+@{
+    ViewData["Title"] = "AllProducts";
+}
+
+<h1>AllProducts</h1>
+
+<p>
+    <a asp-action="AddProduct">Aggiungi un nuovo Prodotto</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductImage)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductPrice)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ProductDeliveryTime)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProductId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProductName)
+                </td>
+                <td>
+                    @if (item.ProductImageUrl != null)
+                    {
+                        <img src="@item.ProductImageUrl" alt="Product Image" style="max-width: 100px; max-height: 100px;" />
+                    }
+                    else
+                    {
+                        <p>Immagine non disponibile</p>
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProductPrice)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProductDeliveryTime)
+                </td>
+                <td>
+                    <a asp-action="UpdateProduct" asp-route-id="@item.ProductId" class="btn btn-primary">Update</a>
+                    <a asp-action="DeleteProduct" asp-route-id="@item.ProductId" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
