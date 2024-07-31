@@ -1,5 +1,7 @@
 using LaPizzeria;
 using LaPizzeria.Models;
+using LaPizzeria.Services.Interfaces;
+using LaPizzeria.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -42,6 +44,11 @@ builder.Services
     });
 
 builder.Services.AddDbContext<InFornoDbContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services
+    .AddScoped<IAuthService, AuthService>()
+    .AddScoped<IIngredientService, IngredientService>()
+    .AddScoped<ICartService,CartService>()
+    .AddScoped<IProductService, ProductService>();
 
 var app = builder.Build();
 

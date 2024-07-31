@@ -1,0 +1,57 @@
+﻿@model LaPizzeria.Models.DTO.CartDTO
+
+@{
+    ViewData["Title"] = "Carrello";
+}
+
+<h1>Il Tuo Carrello</h1>
+
+@if (Model.Items == null || !Model.Items.Any())
+{
+    <p>Il tuo carrello è vuoto.</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Prodotto</th>
+                <th>Quantità</th>
+                <th>Prezzo Unitario</th>
+                <th>Totale</th>
+                <th>Azioni</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>@item.Product.ProductName</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.Product.ProductPrice €</td>
+                    <td>@(item.Product.ProductPrice * item.Quantity) €</td>
+                    <td>
+                        <form asp-action="RemoveFromCart" asp-controller="Cart" method="post" style="display:inline;">
+                            <input type="hidden" name="productId" value="@item.Product.ProductId" />
+                            <button type="submit" class="btn btn-sm btn-danger">Rimuovi</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3"></td>
+                <td><strong>Totale</strong></td>
+                <td><strong>@Model.TotalPrice €</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <div class="d-flex justify-content-between">
+        <a asp-action="Checkout" asp-controller="Cart" class="btn btn-primary">Procedi al Checkout</a>
+        <form asp-action="ClearCart" asp-controller="Cart" method="post">
+            <button type="submit" class="btn btn-secondary">Svuota il Carrello</button>
+        </form>
+    </div>
+}

@@ -2,6 +2,7 @@
 {
     public class IngredientDTO
     {
-        public string IngredientName { get; set; }       
+        public string IngredientName { get; set; }  
+        
     }
 }

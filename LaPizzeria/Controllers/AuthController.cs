@@ -1,21 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using LaPizzeria.Models;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
 using LaPizzeria.Models.DTO;
+using LaPizzeria.Services.Interfaces;
 
 namespace LaPizzeria.Controllers
 {
     public class AuthController : Controller
     {
-        private readonly InFornoDbContext _context;
+        private readonly IAuthService _authService;
 
-        public AuthController(InFornoDbContext context)
+        public AuthController(IAuthService authService)
         {
-            _context = context;
+            _authService = authService;
         }
+
         public IActionResult Register()
         {
             return View();
@@ -29,16 +26,9 @@ namespace LaPizzeria.Controllers
             {
                 return View(user);
             }
-            _context.Users.Add(new User
-            {
-                Username = user.Username,
-                Password = user.Password,
-                Role = user.Role
-            });
-            await _context.SaveChangesAsync();
+            await _authService.RegisterAsync(user);
             return RedirectToAction("Login");
         }
-
 
         public IActionResult Login()
         {
@@ -53,29 +43,21 @@ namespace LaPizzeria.Controllers
             {
                 return View(model);
             }
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == model.Username && u.Password == model.Password);
 
+            var user = await _authService.LoginAsync(model);
             if (user == null)
             {
-                ModelState.AddModelError("string.Empty", "Username o password non corretti");
+                ModelState.AddModelError(string.Empty, "Username o password non corretti");
                 return View(model);
             }
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
-                new Claim(ClaimTypes.Role, user.Role)
-            };
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            var authProperties = new AuthenticationProperties();
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
+
             return RedirectToAction("Index", "Home");
         }
 
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await _authService.LogoutAsync();
             return RedirectToAction("Index", "Home");
         }
     }

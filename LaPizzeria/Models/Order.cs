@@ -16,5 +16,7 @@ namespace LaPizzeria.Models
         public string Note { get; set; }
 
         public DateTime DateTime { get; set; } = DateTime.Now;
+
+        public bool isPaid { get; set; } = false;
     }
 }

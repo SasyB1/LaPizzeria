@@ -1,39 +1,43 @@
 ﻿using LaPizzeria.Models;
 using Microsoft.AspNetCore.Mvc;
 using LaPizzeria.Models.DTO;
-using Microsoft.EntityFrameworkCore;
+using LaPizzeria.Services.Interfaces;
 
 namespace LaPizzeria.Controllers
 {
     public class SupplierController : Controller
     {
-        private readonly InFornoDbContext _context;
+        private readonly IProductService _productService;
+        private readonly IIngredientService _ingredientService;
+        
 
-        public SupplierController(InFornoDbContext context)
+        public SupplierController(IProductService productService, IIngredientService ingredientService)
         {
-            _context = context;
+            _productService = productService;
+            _ingredientService = ingredientService;
         }
 
         public async Task<IActionResult> AllProducts()
         {
-            var products = await _context.Products.Include(p => p.Ingredients).ToListAsync();
+            var products = await _productService.GetAllProductsAsync();
             return View(products);
         }
 
         public async Task<IActionResult> AllIngredients()
         {
-            var ingredients = await _context.Ingredients.ToListAsync();
+            var ingredients = await _ingredientService.GetAllIngredientsAsync();
             return View(ingredients);
         }
 
         public IActionResult AllOrders()
         {
-            return View();
+            var orders = _productService.GetAllOrderAsync();
+            return View(orders);
         }
 
-        public IActionResult AddProduct()
+        public async Task<IActionResult> AddProduct()
         {
-            ViewBag.Ingredients = _context.Ingredients.ToList();
+            ViewBag.Ingredients = await _ingredientService.GetAllIngredientsAsync();
             return View();
         }
 
@@ -44,7 +48,7 @@ namespace LaPizzeria.Controllers
             if (productImage == null || productImage.Length == 0)
             {
                 ModelState.AddModelError("ProductImage", "ProductImage is required.");
-                ViewBag.Ingredients = _context.Ingredients.ToList();
+                ViewBag.Ingredients = await _ingredientService.GetAllIngredientsAsync();
                 return View(productDto);
             }
 
@@ -55,44 +59,18 @@ namespace LaPizzeria.Controllers
                 imageBytes = memoryStream.ToArray();
             }
 
-            var product = new Product
-            {
-                ProductName = productDto.ProductName,
-                ProductImage = imageBytes,
-                Description = productDto.Description,
-                ProductPrice = productDto.ProductPrice,
-                ProductDeliveryTime = productDto.ProductDeliveryTime,
-                Ingredients = new List<Ingredient>()
-            };
-
-            if (SelectedIngredients != null && SelectedIngredients.Any())
-            {
-                foreach (var ingredientId in SelectedIngredients)
-                {
-                    var ingredient = await _context.Ingredients.FindAsync(ingredientId);
-                    if (ingredient != null)
-                    {
-                        product.Ingredients.Add(ingredient);
-                    }
-                }
-            }
-
-            _context.Products.Add(product);
-            await _context.SaveChangesAsync();
+            await _productService.AddProductAsync(productDto, imageBytes, SelectedIngredients);
             return RedirectToAction("AllProducts");
         }
 
         public async Task<IActionResult> UpdateProduct(int id)
         {
-            var product = await _context.Products
-                .Include(p => p.Ingredients)
-                .FirstOrDefaultAsync(p => p.ProductId == id);
-
+            var product = await _productService.GetProductByIdAsync(id);
             if (product == null)
             {
                 return NotFound();
             }
-            ViewBag.Ingredients = _context.Ingredients.ToList();
+            ViewBag.Ingredients = await _ingredientService.GetAllIngredientsAsync();
             return View(product);
         }
 
@@ -100,44 +78,29 @@ namespace LaPizzeria.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateProduct(int id, Product product, IFormFile productImage, List<int> SelectedIngredients)
         {
-            var productToUpdate = await _context.Products
-                .Include(p => p.Ingredients)
-                .FirstOrDefaultAsync(p => p.ProductId == id);
-
-            if (productToUpdate == null)
-            {
-                return NotFound();
-            }
+            byte[] imageBytes = null;
             if (productImage != null && productImage.Length > 0)
             {
                 using (var memoryStream = new MemoryStream())
                 {
                     await productImage.CopyToAsync(memoryStream);
-                    productToUpdate.ProductImage = memoryStream.ToArray();
+                    imageBytes = memoryStream.ToArray();
                 }
             }
-            else if (productToUpdate.ProductImage == null)
+
+            try
             {
-                ModelState.AddModelError("ProductImage", "ProductImage is required.");
-                return View(productToUpdate);
+                await _productService.UpdateProductAsync(id, product, imageBytes, SelectedIngredients);
             }
-            productToUpdate.ProductName = product.ProductName;
-            productToUpdate.Description = product.Description;
-            productToUpdate.ProductPrice = product.ProductPrice;
-            productToUpdate.ProductDeliveryTime = product.ProductDeliveryTime;
-            productToUpdate.Ingredients.Clear();
-            if (SelectedIngredients != null && SelectedIngredients.Any())
+            catch (KeyNotFoundException)
             {
-                foreach (var ingredientId in SelectedIngredients)
-                {
-                    var ingredient = await _context.Ingredients.FindAsync(ingredientId);
-                    if (ingredient != null)
-                    {
-                        productToUpdate.Ingredients.Add(ingredient);
-                    }
-                }
+                return NotFound();
             }
-            await _context.SaveChangesAsync();
+            catch (ArgumentException ex)
+            {
+                ModelState.AddModelError("ProductImage", ex.Message);
+                return View(product);
+            }
 
             return RedirectToAction("AllProducts");
         }
@@ -146,17 +109,15 @@ namespace LaPizzeria.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteProduct(int id)
         {
-            var productToDelete = await _context.Products
-                .Include(p => p.Ingredients)
-                .FirstOrDefaultAsync(p => p.ProductId == id);
-
-            if (productToDelete == null)
+            try
+            {
+                await _productService.DeleteProductAsync(id);
+            }
+            catch (KeyNotFoundException)
             {
                 return NotFound();
             }
 
-            _context.Products.Remove(productToDelete);
-            await _context.SaveChangesAsync();
             return RedirectToAction("AllProducts");
         }
 
@@ -174,31 +135,19 @@ namespace LaPizzeria.Controllers
                 return View(ingredientDto);
             }
 
-            var ingredient = new Ingredient
-            {
-                IngredientName = ingredientDto.IngredientName
-            };
-
-            _context.Ingredients.Add(ingredient);
-            await _context.SaveChangesAsync();
+            await _ingredientService.AddIngredientAsync(ingredientDto);
             return RedirectToAction("AllIngredients");
         }
 
         public async Task<IActionResult> UpdateIngredient(int id)
         {
-            var ingredient = await _context.Ingredients.FindAsync(id);
+            var ingredient = await _ingredientService.GetIngredientByIdAsync(id);
             if (ingredient == null)
             {
                 return NotFound();
             }
 
-            var ingredients = new Ingredient
-            {
-                IngredientId = ingredient.IngredientId,
-                IngredientName = ingredient.IngredientName
-            };
-
-            return View(ingredients);
+            return View(ingredient);
         }
 
         [HttpPost]
@@ -210,15 +159,14 @@ namespace LaPizzeria.Controllers
                 return View(model);
             }
 
-            var ingredientToUpdate = await _context.Ingredients.FindAsync(id);
-            if (ingredientToUpdate == null)
+            try
+            {
+                await _ingredientService.UpdateIngredientAsync(id, model);
+            }
+            catch (KeyNotFoundException)
             {
                 return NotFound();
             }
-
-            ingredientToUpdate.IngredientName = model.IngredientName;
-            _context.Ingredients.Update(ingredientToUpdate);
-            await _context.SaveChangesAsync();
 
             return RedirectToAction("AllIngredients");
         }
@@ -227,16 +175,32 @@ namespace LaPizzeria.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteIngredient(int id)
         {
-            var ingredientToDelete = await _context.Ingredients.FindAsync(id);
-            if (ingredientToDelete == null)
+            try
+            {
+                await _ingredientService.DeleteIngredientAsync(id);
+            }
+            catch (KeyNotFoundException)
             {
                 return NotFound();
             }
 
-            _context.Ingredients.Remove(ingredientToDelete);
-            await _context.SaveChangesAsync();
             return RedirectToAction("AllIngredients");
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MarkOrderIsPaid(int id)
+        {
+            try
+            {
+                await _productService.OrderIsPaidAsync(id);
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction("AllOrders");
+        }
     }
 }
