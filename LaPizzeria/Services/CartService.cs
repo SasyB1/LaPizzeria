@@ -41,9 +41,10 @@ namespace LaPizzeria.Services
                 var order = new Order
                 {
                     Address = model.Address,
-                    User = await _context.Users.FindAsync(userId),
                     Note = model.Note,
-                    DateTime = DateTime.Now
+                    DateTime = model.DateTime,
+                    isPaid = model.isPaid,
+                    User = await _context.Users.FindAsync(userId),
                 };
 
                 _context.Orders.Add(order);
@@ -78,6 +79,8 @@ namespace LaPizzeria.Services
                 throw new Exception("Error while submitting the order", ex);
             }
         }
+
+
 
         public async Task<Order> GetOrderAsync(int orderId)
         {

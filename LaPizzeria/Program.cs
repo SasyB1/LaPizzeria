@@ -6,13 +6,10 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+
 builder.Services.AddControllersWithViews();
-builder.Services.AddSession();
-builder.Services.AddHttpContextAccessor();
 
 
 builder.Services.AddDistributedMemoryCache();
@@ -23,8 +20,11 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
-builder
-    .Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+builder.Services.AddHttpContextAccessor();
+
+
+builder.Services
+    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
         options.LoginPath = "/Auth";
@@ -36,18 +36,22 @@ builder.Services
     {
         options.AddPolicy(Policies.IsAdmin, policy => policy.RequireRole("admin"));
         options.AddPolicy(Policies.IsUser, policy => policy.RequireRole("user"));
-        options.AddPolicy("SupllierOrCustomer", policy =>
-                    policy.RequireAssertion(context =>
-                        context.User.HasClaim(c =>
-                            (c.Type == ClaimTypes.Role && c.Value == "user") ||
-                            (c.Type == ClaimTypes.Role && c.Value == "admin"))));
+        options.AddPolicy("SupplierOrCustomer", policy =>
+            policy.RequireAssertion(context =>
+                context.User.HasClaim(c =>
+                    (c.Type == ClaimTypes.Role && c.Value == "user") ||
+                    (c.Type == ClaimTypes.Role && c.Value == "admin"))));
     });
 
-builder.Services.AddDbContext<InFornoDbContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddDbContext<InFornoDbContext>(opt =>
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
 builder.Services
     .AddScoped<IAuthService, AuthService>()
     .AddScoped<IIngredientService, IngredientService>()
-    .AddScoped<ICartService,CartService>()
+    .AddScoped<ICartService, CartService>()
     .AddScoped<IProductService, ProductService>();
 
 var app = builder.Build();
@@ -65,11 +69,14 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+
+app.UseSession();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
 
 app.Run();

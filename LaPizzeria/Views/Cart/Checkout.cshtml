@@ -1,0 +1,66 @@
+﻿@model LaPizzeria.Models.DTO.OrderDTO
+
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<h1>Checkout</h1>
+
+@if (Model.OrderItems != null && Model.OrderItems.Any())
+{
+    <form asp-action="SubmitOrder" asp-controller="Cart" method="post">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Prodotto</th>
+                    <th>Quantità</th>
+                    <th>Prezzo Unitario</th>
+                    <th>Totale</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (var i = 0; i < Model.OrderItems.Count; i++)
+                {
+                    <tr>
+                        <td>@Model.OrderItems[i].ProductName</td>
+                        <td>@Model.OrderItems[i].Quantity</td>
+                        <td>@Model.OrderItems[i].ProductPrice €</td>
+                        <td>@(Model.OrderItems[i].ProductPrice * Model.OrderItems[i].Quantity) €</td>
+                        <input type="hidden" asp-for="OrderItems[i].ProductId" />
+                        <input type="hidden" asp-for="OrderItems[i].ProductName" />
+                        <input type="hidden" asp-for="OrderItems[i].ProductPrice" />
+                        <input type="hidden" asp-for="OrderItems[i].Quantity" />
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3"><strong>Totale</strong></td>
+                    <td><strong>@Model.OrderItems.Sum(i => i.ProductPrice * i.Quantity) €</strong></td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="form-group">
+            <label asp-for="User.Username">Nome Utente</label>
+            <input type="text" class="form-control" asp-for="User.Username" readonly />
+        </div>
+        <div class="form-group">
+            <label asp-for="Address">Indirizzo</label>
+            <input type="text" class="form-control" asp-for="Address" required />
+        </div>
+        <div class="form-group">
+            <label asp-for="Note">Note</label>
+            <textarea class="form-control" asp-for="Note"></textarea>
+        </div>
+        <div class="form-group">
+            <input type="hidden" asp-for="DateTime" />
+            <input type="hidden" asp-for="isPaid" />
+        </div>
+        <button type="submit" class="btn btn-primary">Invia Ordine</button>
+    </form>
+}
+else
+{
+    <p>Il carrello è vuoto.</p>
+}

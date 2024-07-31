@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LaPizzeria.Migrations
 {
     [DbContext(typeof(InFornoDbContext))]
-    [Migration("20240730160932_InizioPizzeria")]
+    [Migration("20240731173106_InizioPizzeria")]
     partial class InizioPizzeria
     {
         /// <inheritdoc />
@@ -79,22 +79,25 @@ namespace LaPizzeria.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("isPaid")
+                        .HasColumnType("bit");
+
                     b.HasKey("OrderId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Checkouts");
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("LaPizzeria.Models.OrderItem", b =>
                 {
-                    b.Property<int>("OrderId")
+                    b.Property<int>("OrderItemId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderItemId"));
 
-                    b.Property<int>("OrderId1")
+                    b.Property<int>("OrderId")
                         .HasColumnType("int");
 
                     b.Property<int>("ProductId")
@@ -103,13 +106,13 @@ namespace LaPizzeria.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.HasKey("OrderId");
+                    b.HasKey("OrderItemId");
 
-                    b.HasIndex("OrderId1");
+                    b.HasIndex("OrderId");
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("OrderItems");
                 });
 
             modelBuilder.Entity("LaPizzeria.Models.Product", b =>
@@ -202,7 +205,7 @@ namespace LaPizzeria.Migrations
                 {
                     b.HasOne("LaPizzeria.Models.Order", null)
                         .WithMany("OrderItems")
-                        .HasForeignKey("OrderId1")
+                        .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

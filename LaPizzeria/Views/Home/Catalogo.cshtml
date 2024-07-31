@@ -20,7 +20,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="btn-group">
                             <a asp-action="Details" asp-route-id="@item.ProductId" class="btn btn-sm btn-outline-secondary">Details</a>
-                            <form id="add-to-cart-form-@item.ProductId" asp-action="AddToCart" asp-controller="Cart" method="post" onsubmit="handleSubmit(event, @item.ProductId)">
+                            <form asp-action="AddToCart" asp-controller="Cart" method="post">
                                 <input type="hidden" name="productId" value="@item.ProductId" />
                                 <input type="number" name="quantity" min="1" value="1" class="form-control" style="width: 100px; display: inline-block;" />
                                 <button type="submit" class="btn btn-sm btn-primary">Add to Cart</button>
@@ -37,32 +37,4 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-
-<script>
-    function handleSubmit(event, productId) {
-        event.preventDefault(); // Previene il comportamento predefinito del modulo
-
-        var form = document.getElementById('add-to-cart-form-' + productId);
-        var formData = new FormData(form);
-
-        fetch(form.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
-            }
-        })
-            .then(response => {
-                if (response.ok) {
-                    window.location.href = '@Url.Action("Index", "Cart")'; // Redirect alla pagina dell'indice del carrello
-                } else {
-                    alert('An error occurred while adding the item to the cart.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred while adding the item to the cart.');
-            });
-    }
-    </script>
 }

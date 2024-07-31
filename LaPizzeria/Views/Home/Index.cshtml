@@ -1,7 +1,16 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
+@{
+    var orderSuccess = Convert.ToBoolean(ViewContext.HttpContext.Request.Query["orderSuccess"]);
+}
 
+@if (orderSuccess)
+{
+    <div class="alert alert-success">
+        Ordine inviato con successo!
+    </div>
+}
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>

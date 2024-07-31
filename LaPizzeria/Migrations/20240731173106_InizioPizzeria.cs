@@ -81,7 +81,7 @@ namespace LaPizzeria.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Checkouts",
+                name: "Orders",
                 columns: table => new
                 {
                     OrderId = table.Column<int>(type: "int", nullable: false)
@@ -89,13 +89,14 @@ namespace LaPizzeria.Migrations
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     Note = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DateTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    isPaid = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Checkouts", x => x.OrderId);
+                    table.PrimaryKey("PK_Orders", x => x.OrderId);
                     table.ForeignKey(
-                        name: "FK_Checkouts_Users_UserId",
+                        name: "FK_Orders_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "UserId",
@@ -103,26 +104,26 @@ namespace LaPizzeria.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Orders",
+                name: "OrderItems",
                 columns: table => new
                 {
-                    OrderId = table.Column<int>(type: "int", nullable: false)
+                    OrderItemId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    OrderId = table.Column<int>(type: "int", nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false),
-                    OrderId1 = table.Column<int>(type: "int", nullable: false)
+                    Quantity = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Orders", x => x.OrderId);
+                    table.PrimaryKey("PK_OrderItems", x => x.OrderItemId);
                     table.ForeignKey(
-                        name: "FK_Orders_Checkouts_OrderId1",
-                        column: x => x.OrderId1,
-                        principalTable: "Checkouts",
+                        name: "FK_OrderItems_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
                         principalColumn: "OrderId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Orders_Products_ProductId",
+                        name: "FK_OrderItems_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "ProductId",
@@ -130,24 +131,24 @@ namespace LaPizzeria.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Checkouts_UserId",
-                table: "Checkouts",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_IngredientProduct_ProductsProductId",
                 table: "IngredientProduct",
                 column: "ProductsProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Orders_OrderId1",
-                table: "Orders",
-                column: "OrderId1");
+                name: "IX_OrderItems_OrderId",
+                table: "OrderItems",
+                column: "OrderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Orders_ProductId",
-                table: "Orders",
+                name: "IX_OrderItems_ProductId",
+                table: "OrderItems",
                 column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_UserId",
+                table: "Orders",
+                column: "UserId");
         }
 
         /// <inheritdoc />
@@ -157,13 +158,13 @@ namespace LaPizzeria.Migrations
                 name: "IngredientProduct");
 
             migrationBuilder.DropTable(
-                name: "Orders");
+                name: "OrderItems");
 
             migrationBuilder.DropTable(
                 name: "Ingredients");
 
             migrationBuilder.DropTable(
-                name: "Checkouts");
+                name: "Orders");
 
             migrationBuilder.DropTable(
                 name: "Products");
