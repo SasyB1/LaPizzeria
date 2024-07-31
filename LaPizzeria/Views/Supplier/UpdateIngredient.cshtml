@@ -1,4 +1,4 @@
-﻿@model LaPizzeria.Models.DTO.IngredientDTO
+﻿@model LaPizzeria.Models.Ingredient
 
 @{
     ViewData["Title"] = "UpdateIngredient";
@@ -12,6 +12,7 @@
     <div class="col-md-4">
         <form asp-action="UpdateIngredient">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="IngredientId" />
             <div class="form-group">
                 <label asp-for="IngredientName" class="control-label"></label>
                 <input asp-for="IngredientName" class="form-control" />
@@ -25,9 +26,11 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="AllIngredients">Back to List</a>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

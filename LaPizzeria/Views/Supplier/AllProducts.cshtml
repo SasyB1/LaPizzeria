@@ -30,6 +30,9 @@
             <th>
                 @Html.DisplayNameFor(model => model.ProductDeliveryTime)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.First().Ingredients)
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -61,6 +64,21 @@
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.ProductDeliveryTime)
+                </td>
+                <td>
+                    @if (item.Ingredients != null && item.Ingredients.Any())
+                    {
+                        <ul>
+                            @foreach (var ingredient in item.Ingredients)
+                            {
+                                <li>@ingredient.IngredientName</li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p>Nessun ingrediente</p>
+                    }
                 </td>
                 <td>
                     <a asp-action="UpdateProduct" asp-route-id="@item.ProductId" class="btn btn-primary">Update</a>

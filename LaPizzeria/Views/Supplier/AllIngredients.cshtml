@@ -1,0 +1,52 @@
+﻿@model IEnumerable<LaPizzeria.Models.Ingredient>
+
+@{
+    ViewData["Title"] = "AllIngredients";
+}
+
+<h1>AllIngredients</h1>
+
+<p>
+    <a asp-action="AddIngredient">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.IngredientId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IngredientName)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IngredientId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.IngredientName)
+                </td>
+                <td>
+                    <a asp-action="UpdateIngredient" asp-route-id="@item.IngredientId" class="btn btn-primary">Update</a>
+                    <form asp-action="DeleteIngredient" asp-route-id="@item.IngredientId" method="post" style="display:inline;" onsubmit="confirmDelete(event);">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section Scripts {
+    <script type="text/javascript">
+        function confirmDelete(event) {
+            if (!confirm('Sei sicuro di voler eliminare questo prodotto?')) {
+                event.preventDefault();
+            }
+        }
+    </script>
+}
