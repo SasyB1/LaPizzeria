@@ -4,7 +4,19 @@
     ViewData["Title"] = "All Orders";
 }
 
-<h1>All Orders</h1>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+
+    <h1>All Orders</h1>
+    <div class="text-right">
+        <p><strong>Total Paid Orders: </strong>@ViewBag.TotalPaidOrders</p>
+        <p><strong>Total Income Today: </strong>@ViewBag.TotalIncome €</p>
+    </div>
+</div>
+
+<div class="mb-3">
+    <a asp-action="TotalIncome" class="btn btn-primary">Total Income</a>
+</div>
 
 <table class="table">
     <thead>

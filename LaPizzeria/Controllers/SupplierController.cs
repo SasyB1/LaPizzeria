@@ -32,6 +32,10 @@ namespace LaPizzeria.Controllers
         public async Task<IActionResult> AllOrders()
         {
             var orders = await _productService.GetAllOrderAsync();
+            var totalRevenue = await _productService.GetTotalIncomeAsync(DateTime.Today);
+
+            ViewBag.TotalIncome = totalRevenue;
+
             return View(orders);
         }
 
@@ -200,6 +204,5 @@ namespace LaPizzeria.Controllers
                 return Json(new { success = false, message = "Ordine non trovato." });
             }
         }
-
     }
 }

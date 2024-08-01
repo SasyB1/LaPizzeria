@@ -145,36 +145,17 @@ namespace LaPizzeria.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<int> GetTotalPaidOrdersAsync(DateTime? date = null)
+        public async Task<int> GetTotalPaidOrdersAsync()
         {
-            if (date.HasValue)
-            {
-                return await _context.Orders
-                    .Where(o => o.isPaid && o.DateTime.Date == date.Value.Date)
-                    .CountAsync();
-            }
-            else
-            {
-                return await _context.Orders
-                    .Where(o => o.isPaid)
-                    .CountAsync();
-            }
+            return await _context.Orders.CountAsync(o => o.isPaid);
         }
 
-        public async Task<decimal> GetTotalIncomeAsync(DateTime? date = null)
+        public async Task<decimal> GetTotalIncomeAsync(DateTime date)
         {
-            if (date.HasValue)
-            {
-                return await _context.Orders
-                    .Where(o => o.isPaid && o.DateTime.Date == date.Value.Date)
-                    .SumAsync(o => o.OrderItems.Sum(oi => oi.Product.ProductPrice * oi.Quantity));
-            }
-            else
-            {
-                return await _context.Orders
-                    .Where(o => o.isPaid)
-                    .SumAsync(o => o.OrderItems.Sum(oi => oi.Product.ProductPrice * oi.Quantity));
-            }
+            return await _context.Orders
+                .Where(o => o.isPaid && o.DateTime.Date == date.Date)
+                .SelectMany(o => o.OrderItems)
+                .SumAsync(oi => oi.Quantity * oi.Product.ProductPrice);
         }
     }
 }
