@@ -1,7 +1,7 @@
-﻿@model List<LaPizzeria.Models.DTO.CheckoutDTO>
+﻿@model List<LaPizzeria.Models.DTO.OrderDTO>
 
-    @{
-    ViewData["Title"] = "AllOrders";
+@{
+    ViewData["Title"] = "All Orders";
 }
 
 <h1>All Orders</h1>
@@ -11,6 +11,10 @@
         <tr>
             <th>Order ID</th>
             <th>Address</th>
+            <th>User</th>
+            <th>Note</th>
+            <th>Date and Time</th>
+            <th>Order Items</th>
             <th>Status</th>
             <th>Action</th>
         </tr>
@@ -18,20 +22,62 @@
     <tbody>
         @foreach (var order in Model)
         {
-            <tr>
+            <tr id="order-@order.OrderId">
                 <td>@order.OrderId</td>
                 <td>@order.Address</td>
-                <td>@(order.isPaid ? "Shipped" : "Pending")</td>
+                <td>@order.User.Username</td>
+                <td>@order.Note</td>
+                <td>@order.DateTime.ToString("g")</td>
+                <td>
+                    <ul>
+                        @foreach (var item in order.OrderItems)
+                        {
+                            <li>@item.ProductName - @item.Quantity</li>
+                        }
+                    </ul>
+                </td>
+                <td class="status">@(order.isPaid ? "Paid" : "Pending")</td>
                 <td>
                     @if (!order.isPaid)
                     {
-                        <form asp-action="MarkOrderAsShipped" asp-route-orderId="@order.OrderId" method="post">
-                            <button type="submit" class="btn btn-success">Mark as Shipped</button>
-                            @Html.AntiForgeryToken()
-                        </form>
+                        <button class="btn btn-success mark-as-paid" data-order-id="@order.OrderId">Mark as Paid</button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-info" disabled>Paid</button>
                     }
                 </td>
             </tr>
         }
     </tbody>
 </table>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.mark-as-paid').click(function () {
+                var button = $(this);
+                var orderId = button.data('order-id');
+
+                $.ajax({
+                    url: '@Url.Action("MarkOrderIsPaid", "Supplier")',
+                    type: 'POST',
+                    data: { orderId: orderId },
+                    success: function (response) {
+                        if (response.success) {
+                            var row = $('#order-' + orderId);
+                            row.find('.status').text('Paid');
+                            button.removeClass('btn-success').addClass('btn-info').text('Paid').prop('disabled', true);
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('AJAX Error:', status, error);
+                        alert('An error occurred while updating the order status.');
+                    }
+                });
+            });
+        });
+    </script>
+}

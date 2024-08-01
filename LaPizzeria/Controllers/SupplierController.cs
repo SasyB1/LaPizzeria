@@ -29,9 +29,9 @@ namespace LaPizzeria.Controllers
             return View(ingredients);
         }
 
-        public IActionResult AllOrders()
+        public async Task<IActionResult> AllOrders()
         {
-            var orders = _productService.GetAllOrderAsync();
+            var orders = await _productService.GetAllOrderAsync();
             return View(orders);
         }
 
@@ -188,19 +188,18 @@ namespace LaPizzeria.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> MarkOrderIsPaid(int id)
+        public async Task<IActionResult> MarkOrderIsPaid(int orderId)
         {
             try
             {
-                await _productService.OrderIsPaidAsync(id);
+                await _productService.OrderIsPaidAsync(orderId);
+                return Json(new { success = true });
             }
             catch (KeyNotFoundException)
             {
-                return NotFound();
+                return Json(new { success = false, message = "Ordine non trovato." });
             }
-
-            return RedirectToAction("AllOrders");
         }
+
     }
 }

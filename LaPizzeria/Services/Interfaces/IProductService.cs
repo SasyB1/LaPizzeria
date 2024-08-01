@@ -12,5 +12,7 @@ namespace LaPizzeria.Services.Interfaces
         Task DeleteProductAsync(int id);
         Task<List<OrderDTO>> GetAllOrderAsync();
         Task OrderIsPaidAsync(int orderId);
+        Task<int> GetTotalPaidOrdersAsync(DateTime? date = null);
+        Task<decimal> GetTotalIncomeAsync(DateTime? date = null);
     }
 }

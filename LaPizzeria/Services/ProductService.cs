@@ -122,10 +122,12 @@ namespace LaPizzeria.Services
                     ProductPrice = oi.Product.ProductPrice,
                     Quantity = oi.Quantity
                 }).ToList(),
+                OrderId = o.OrderId,
                 Address = o.Address,
                 Note = o.Note,
                 User = o.User,
                 DateTime = o.DateTime,
+                isPaid = o.isPaid
             }).ToList();
 
             return orderDTOs;
@@ -141,6 +143,38 @@ namespace LaPizzeria.Services
 
             order.isPaid = true;
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<int> GetTotalPaidOrdersAsync(DateTime? date = null)
+        {
+            if (date.HasValue)
+            {
+                return await _context.Orders
+                    .Where(o => o.isPaid && o.DateTime.Date == date.Value.Date)
+                    .CountAsync();
+            }
+            else
+            {
+                return await _context.Orders
+                    .Where(o => o.isPaid)
+                    .CountAsync();
+            }
+        }
+
+        public async Task<decimal> GetTotalIncomeAsync(DateTime? date = null)
+        {
+            if (date.HasValue)
+            {
+                return await _context.Orders
+                    .Where(o => o.isPaid && o.DateTime.Date == date.Value.Date)
+                    .SumAsync(o => o.OrderItems.Sum(oi => oi.Product.ProductPrice * oi.Quantity));
+            }
+            else
+            {
+                return await _context.Orders
+                    .Where(o => o.isPaid)
+                    .SumAsync(o => o.OrderItems.Sum(oi => oi.Product.ProductPrice * oi.Quantity));
+            }
         }
     }
 }
