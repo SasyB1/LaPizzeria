@@ -4,9 +4,11 @@ using LaPizzeria.Models.DTO;
 using LaPizzeria.Models;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LaPizzeria.Controllers
 {
+    [Authorize(Policy = Policies.SupplierOrCustomer)]
     public class CartController : Controller
     {
         private readonly ICartService _cartService;
@@ -54,7 +56,8 @@ namespace LaPizzeria.Controllers
        
 
         [HttpPost]
-        public async Task<IActionResult> SubmitOrder(OrderDTO model)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubmitOrder([Bind("OrderId,OrderItems,Address,User,Note,DateTime,isPaid")] OrderDTO model)
         {
             var userId = _authService.GetCurrentUserId();
             var cart = _cartService.GetCart();

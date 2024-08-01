@@ -2,9 +2,11 @@ using LaPizzeria.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using LaPizzeria.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LaPizzeria.Controllers
 {
+    
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -21,12 +23,13 @@ namespace LaPizzeria.Controllers
             return View();
         }
 
+        [Authorize(Policy = Policies.SupplierOrCustomer)]
         public async Task<IActionResult> Catalogo()
         {
             var products = await _productService.GetAllProductsAsync();
             return View(products);
         }
-
+        [Authorize(Policy = Policies.SupplierOrCustomer)]
         public async Task<IActionResult> Details(int id)
         {
             var product = await _productService.GetProductByIdAsync(id);

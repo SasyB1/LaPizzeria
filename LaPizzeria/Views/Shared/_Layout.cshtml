@@ -23,20 +23,20 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Catalogo">Catalogo</a>
                         </li>
+                        @if(User.IsInRole("admin"))
+                        {                   
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="Supplier" asp-action="AllProducts">Prodotti</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="Supplier" asp-action="AllIngredients">ingredienti</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Catalogo">Catalogo</a>
-                        </li>
+                        </li>                      
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="Supplier" asp-action="AllOrders">BackOffice</a>
                         </li>
+                        }
                     </ul>
                     <div class="d-lg-flex flex-lg-fill justify-content-end align-items-center">
                         @if (!Context.User.Identity.IsAuthenticated)

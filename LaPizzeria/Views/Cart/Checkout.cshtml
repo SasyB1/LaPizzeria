@@ -10,6 +10,7 @@
     @if (Model.OrderItems != null && Model.OrderItems.Any())
     {
         <form asp-action="SubmitOrder" asp-controller="Cart" method="post">
+            @Html.AntiForgeryToken()
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-primary text-white">
                     <h4 class="card-title mb-0">Riepilogo Ordine</h4>

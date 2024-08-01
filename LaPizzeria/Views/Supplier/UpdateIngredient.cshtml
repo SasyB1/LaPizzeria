@@ -13,6 +13,7 @@
         </div>
         <div class="card-body">
             <form asp-action="UpdateIngredient">
+                @Html.AntiForgeryToken()
                 <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
                 <input type="hidden" asp-for="IngredientId" />
                 <div class="form-group">

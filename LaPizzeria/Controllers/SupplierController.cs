@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using LaPizzeria.Models.DTO;
 using LaPizzeria.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LaPizzeria.Controllers
 {
+    [Authorize(Policy = Policies.IsAdmin)]
     public class SupplierController : Controller
     {
         private readonly IProductService _productService;
@@ -50,7 +52,7 @@ namespace LaPizzeria.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddProduct(ProductDTO productDto, IFormFile productImage, List<int> SelectedIngredients)
+        public async Task<IActionResult> AddProduct([Bind("ProductName,ProductPrice,ProductDeliveryTime,Description")] ProductDTO productDto, IFormFile productImage, List<int> SelectedIngredients)
         {
             if (productImage == null || productImage.Length == 0)
             {
@@ -83,7 +85,7 @@ namespace LaPizzeria.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateProduct(int id, Product product, IFormFile productImage, List<int> SelectedIngredients)
+        public async Task<IActionResult> UpdateProduct(int id, [Bind("ProductName,ProductPrice,ProductDeliveryTime,Description")] Product product, IFormFile productImage, List<int> SelectedIngredients)
         {
             byte[] imageBytes = null;
             if (productImage != null && productImage.Length > 0)
@@ -112,8 +114,7 @@ namespace LaPizzeria.Controllers
             return RedirectToAction("AllProducts");
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        [HttpPost]        
         public async Task<IActionResult> DeleteProduct(int id)
         {
             try
@@ -159,7 +160,7 @@ namespace LaPizzeria.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateIngredient(int id, Ingredient model)
+        public async Task<IActionResult> UpdateIngredient([Bind("IngredientName")] int id, Ingredient model)
         {
             if (!ModelState.IsValid)
             {
@@ -179,7 +180,6 @@ namespace LaPizzeria.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteIngredient(int id)
         {
             try
