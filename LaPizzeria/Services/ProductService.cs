@@ -145,9 +145,10 @@ namespace LaPizzeria.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<int> GetTotalPaidOrdersAsync()
+        public async Task<int> GetTotalPaidOrdersAsync(DateTime date)
         {
-            return await _context.Orders.CountAsync(o => o.isPaid);
+            return await _context.Orders
+                .CountAsync(o => o.isPaid && o.DateTime.Date == date.Date);
         }
 
         public async Task<decimal> GetTotalIncomeAsync(DateTime date)

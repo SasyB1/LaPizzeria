@@ -2,20 +2,27 @@
 
 @{
     ViewData["Title"] = "All Orders";
+    var currentDate = ViewBag.SelectedDate ?? DateTime.Today.ToString("dd-MM-yyyyy");
 }
 
-
 <div class="d-flex justify-content-between align-items-center mb-3">
-
     <h1>All Orders</h1>
-    <div class="text-right">
-        <p><strong>Total Paid Orders: </strong>@ViewBag.TotalPaidOrders</p>
-        <p><strong>Total Income Today: </strong>@ViewBag.TotalIncome €</p>
+    <div class="text-center">
+        <p><strong>@currentDate</strong></p>
+        <p><strong>Total Paid Orders : </strong>@ViewBag.TotalPaidOrders</p>
+        <p><strong>Total Income : </strong>@ViewBag.TotalIncome €</p>
     </div>
 </div>
 
 <div class="mb-3">
-    <a asp-action="TotalIncome" class="btn btn-primary">Total Income</a>
+    <form asp-action="AllOrders" method="get">
+        <div class="input-group">
+            <input type="date" name="date" class="form-control" value="@currentDate" />
+            <div class="input-group-append">
+                <button type="submit" class="btn btn-secondary">Filter by Date</button>
+            </div>
+        </div>
+    </form>
 </div>
 
 <table class="table">

@@ -29,12 +29,15 @@ namespace LaPizzeria.Controllers
             return View(ingredients);
         }
 
-        public async Task<IActionResult> AllOrders()
+        public async Task<IActionResult> AllOrders(DateTime? date)
         {
+            var currentDate = date ?? DateTime.Today;
             var orders = await _productService.GetAllOrderAsync();
-            var totalRevenue = await _productService.GetTotalIncomeAsync(DateTime.Today);
-
-            ViewBag.TotalIncome = totalRevenue;
+            var totalPaidOrders = await _productService.GetTotalPaidOrdersAsync(currentDate);
+            var totalIn = await _productService.GetTotalIncomeAsync(currentDate);
+            ViewBag.TotalPaidOrders = totalPaidOrders;
+            ViewBag.TotalIncome = totalIn.ToString("F2"); 
+            ViewBag.SelectedDate = currentDate.ToString("dd-MM-yyyyy");
 
             return View(orders);
         }
