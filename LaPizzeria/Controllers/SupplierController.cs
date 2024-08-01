@@ -200,11 +200,22 @@ namespace LaPizzeria.Controllers
             try
             {
                 await _productService.OrderIsPaidAsync(orderId);
-                return Json(new { success = true });
+                var totalPaidOrders = await _productService.GetTotalPaidOrdersAsync(DateTime.Now);
+                var totalIncome = await _productService.GetTotalIncomeAsync(DateTime.Now);
+                return Json(new
+                {
+                    success = true,
+                    totalPaidOrders = totalPaidOrders,
+                    totalIncome = totalIncome
+                });
             }
             catch (KeyNotFoundException)
             {
                 return Json(new { success = false, message = "Ordine non trovato." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Si è verificato un errore." });
             }
         }
     }

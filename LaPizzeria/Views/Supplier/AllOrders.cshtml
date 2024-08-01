@@ -10,8 +10,8 @@
         <h1 class="mb-0">All Orders</h1>
         <div class="text-center">
             <p><strong>@currentDate</strong></p>
-            <p><strong>Total Paid Orders: </strong>@ViewBag.TotalPaidOrders</p>
-            <p><strong>Total Income: </strong>@ViewBag.TotalIncome €</p>
+            <p><strong>Total Paid Orders: </strong><span id="total-paid-orders">@ViewBag.TotalPaidOrders</span></p>
+            <p><strong>Total Income: </strong><span id="total-income">@ViewBag.TotalIncome</span> €</p>
         </div>
     </div>
 
@@ -92,6 +92,9 @@
                             var row = $('#order-' + orderId);
                             row.find('.status').text('Paid');
                             button.removeClass('btn-success').addClass('btn-info').text('Paid').prop('disabled', true);
+
+                            $('#total-paid-orders').text(response.totalPaidOrders);
+                            $('#total-income').text(response.totalIncome.toFixed(2));
                         } else {
                             alert('Error: ' + response.message);
                         }
