@@ -1,32 +1,34 @@
 ﻿@model LaPizzeria.Models.Ingredient
 
 @{
-    ViewData["Title"] = "UpdateIngredient";
+    ViewData["Title"] = "Update Ingredient";
 }
 
-<h1>UpdateIngredient</h1>
+<div class="container mt-4">
+    <h1 class="mb-4 text-center">Update Ingredient</h1>
 
-<h4>IngredientDTO</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="UpdateIngredient">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="IngredientId" />
-            <div class="form-group">
-                <label asp-for="IngredientName" class="control-label"></label>
-                <input asp-for="IngredientName" class="form-control" />
-                <span asp-validation-for="IngredientName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h4 class="card-title mb-0">Ingredient Details</h4>
+        </div>
+        <div class="card-body">
+            <form asp-action="UpdateIngredient">
+                <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                <input type="hidden" asp-for="IngredientId" />
+                <div class="form-group">
+                    <label asp-for="IngredientName" class="control-label">Ingredient Name</label>
+                    <input asp-for="IngredientName" class="form-control" placeholder="Enter ingredient name" />
+                    <span asp-validation-for="IngredientName" class="text-danger"></span>
+                </div>
+                <div class="form-group text-right mt-3">
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                </div>
+            </form>
+        </div>
+        <div class="card-footer text-right">
+            <a asp-action="AllIngredients" class="btn btn-secondary">Back to List</a>
+        </div>
     </div>
-</div>
-
-<div>
-    <a asp-action="AllIngredients">Back to List</a>
 </div>
 
 @section Scripts {
@@ -34,3 +36,4 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
+

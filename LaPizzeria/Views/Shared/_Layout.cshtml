@@ -26,12 +26,6 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Auth" asp-action="Login">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Auth" asp-action="Register">Register</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="Supplier" asp-action="AllProducts">Prodotti</a>
                         </li>
                         <li class="nav-item">
@@ -44,6 +38,19 @@
                             <a class="nav-link text-dark" asp-controller="Supplier" asp-action="AllOrders">BackOffice</a>
                         </li>
                     </ul>
+                    <div class="d-lg-flex flex-lg-fill justify-content-end align-items-center">
+                        @if (!Context.User.Identity.IsAuthenticated)
+                        {
+                            <a class="nav-link text-dark" asp-controller="Auth" asp-action="Login">Login</a>
+                            <a class="nav-link text-dark" asp-controller="Auth" asp-action="Register">Register</a>
+                        }
+                        else
+                        {
+                            <form asp-controller="Auth" asp-action="Logout" method="post" style="display: inline;">
+                                <button type="submit" class="btn btn-link text-dark">Logout</button>
+                            </form>
+                        }
+                    </div>
                 </div>
             </div>
         </nav>

@@ -1,17 +1,41 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
-}
-@{
-    var orderSuccess = Convert.ToBoolean(ViewContext.HttpContext.Request.Query["orderSuccess"]);
+    ViewData["Title"] = "Home";
 }
 
-@if (orderSuccess)
-{
-    <div class="alert alert-success">
-        Ordine inviato con successo!
-    </div>
-}
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+<div class="bg-light p-5 rounded-lg m-3">
+    <h1 class="display-4">Benvenuti alla Pizzeria InForno!</h1>
+    <p class="lead">La migliore pizza di Napoli, fatta con amore e ingredienti freschi.</p>
+    <a class="btn btn-primary btn-lg" href="@Url.Action("Catalogo", "Home")" role="button">Scopri il nostro menu</a>
 </div>
+
+<div class="container mt-5">
+    <h2 class="text-center">Le piu' ordinate</h2>
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <img class="card-img-top cardHomepage" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfvLQfA3H5LOHdkoOuDVIDsYSMu6YKaVRuVg&s" alt="Pizza Margherita">
+                <div class="card-body">
+                    <h5 class="card-title">Pizza Margherita</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <img class="card-img-top cardHomepage" src="https://www.cucinare.it/uploads/wp-content/uploads/2015/10/ricetta_pizza_alla_diavola.jpg" alt="Pizza Diavola">
+                <div class="card-body">
+                    <h5 class="card-title">Pizza Diavola</h5>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <img class="card-img-top cardHomepage" src="https://www.ricettealvolo.it/wp-content/uploads/2023/02/pizza-capricciosa-scaled.jpg" alt="Pizza Capricciosa">
+                <div class="card-body">
+                    <h5 class="card-title">Pizza Capricciosa</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
