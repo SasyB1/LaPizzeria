@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "All Orders";
-    var currentDate = ViewBag.SelectedDate ?? DateTime.Today.ToString("dd-MM-yyyy");
+    var currentDate = ViewBag.SelectedDate ?? DateTime.Today.ToString("yyyy-MM-dd");
 }
 
 <div class="container mt-4">
@@ -16,12 +16,9 @@
     </div>
 
     <div class="mb-3">
-        <form asp-action="AllOrders" method="get">
+        <form id="dateFilterForm" asp-action="AllOrders" method="get">
             <div class="input-group">
-                <input type="date" name="date" class="form-control" value="@currentDate" />
-                <div class="input-group-append">
-                    <button type="submit" class="btn btn-secondary">Filter by Date</button>
-                </div>
+                <input type="date" name="date" class="form-control" value="@currentDate" onchange="document.getElementById('dateFilterForm').submit();" />
             </div>
         </form>
     </div>
@@ -53,7 +50,6 @@
                                     @foreach (var item in order.OrderItems)
                                     {
                                         <li> @item.ProductName x  @item.Quantity</li>
-                                       
                                     }
                                 </ul>
                             </td>
@@ -108,4 +104,3 @@
         });
     </script>
 }
-

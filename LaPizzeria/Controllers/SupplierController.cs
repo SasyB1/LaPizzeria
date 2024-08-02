@@ -35,14 +35,18 @@ namespace LaPizzeria.Controllers
         {
             var currentDate = date ?? DateTime.Today;
             var orders = await _productService.GetAllOrderAsync();
+            var filteredOrders = orders.Where(o => o.DateTime.Date == currentDate.Date).ToList();
+
             var totalPaidOrders = await _productService.GetTotalPaidOrdersAsync(currentDate);
             var totalIn = await _productService.GetTotalIncomeAsync(currentDate);
-            ViewBag.TotalPaidOrders = totalPaidOrders;
-            ViewBag.TotalIncome = totalIn.ToString("F2"); 
-            ViewBag.SelectedDate = currentDate.ToString("dd-MM-yyyyy");
 
-            return View(orders);
+            ViewBag.TotalPaidOrders = totalPaidOrders;
+            ViewBag.TotalIncome = totalIn.ToString("F2");
+            ViewBag.SelectedDate = currentDate.ToString("yyyy-MM-dd");
+
+            return View(filteredOrders);
         }
+
 
         public async Task<IActionResult> AddProduct()
         {
