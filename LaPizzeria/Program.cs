@@ -36,7 +36,7 @@ builder.Services
     {
         options.AddPolicy(Policies.IsAdmin, policy => policy.RequireRole("admin"));
         options.AddPolicy(Policies.IsUser, policy => policy.RequireRole("user"));
-        options.AddPolicy("SupplierOrCustomer", policy =>
+        options.AddPolicy(Policies.SupplierOrCustomer, policy =>
             policy.RequireAssertion(context =>
                 context.User.HasClaim(c =>
                     (c.Type == ClaimTypes.Role && c.Value == "user") ||
