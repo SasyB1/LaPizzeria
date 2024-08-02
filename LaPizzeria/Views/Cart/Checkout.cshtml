@@ -9,7 +9,7 @@
 
     @if (Model.OrderItems != null && Model.OrderItems.Any())
     {
-        <form asp-action="SubmitOrder" asp-controller="Cart" method="post">
+        <form id="orderForm" asp-action="SubmitOrder" asp-controller="Cart" method="post">
             @Html.AntiForgeryToken()
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-primary text-white">
@@ -87,3 +87,27 @@
     }
 </div>
 
+
+@section Scripts {
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <script>
+            document.getElementById('orderForm').addEventListener('submit', function (event) {
+                event.preventDefault();
+                const form = event.target;
+                Swal.fire({
+                    title: "Conferma Ordine",
+                    text: "Sei sicuro di voler inviare l'ordine?",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Sì, invia!",
+                    cancelButtonText: "Annulla"
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        </script>
+    }
+}

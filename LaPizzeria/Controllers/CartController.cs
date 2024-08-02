@@ -46,14 +46,14 @@ namespace LaPizzeria.Controllers
                     Quantity = c.Quantity
                 }).ToList(),
                 User = user,
-                Address = "", 
-                Note = "" 
+                Address = "",
+                Note = ""
             };
 
             return View(orderDTO);
         }
 
-       
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -72,7 +72,6 @@ namespace LaPizzeria.Controllers
             {
                 var orderId = await _cartService.SubmitOrderAsync(model, userId, cart);
                 _cartService.ClearCart();
-
                 return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
@@ -87,27 +86,49 @@ namespace LaPizzeria.Controllers
         {
             if (quantity <= 0)
             {
-                ModelState.AddModelError("", "Quantity must be greater than zero.");
-                return RedirectToAction("Index", "Cart"); 
+                ModelState.AddModelError("", "La quantita' dev essere maggiore di 0.");
+                return RedirectToAction("Index", "Cart");
             }
 
             try
             {
                 _cartService.AddToCart(productId, quantity);
-                return RedirectToAction("Index"); 
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", $"Error adding item to cart: {ex.Message}");
+                ModelState.AddModelError("", $"Errore durante l'aggiunta al carrello: {ex.Message}");
                 return RedirectToAction("Index", "Cart");
             }
         }
 
         [HttpPost]
+        public IActionResult RemoveFromCart(int productId)
+        {
+            if (productId <= 0)
+            {
+                ModelState.AddModelError("", "Prodotto non valido.");
+                return RedirectToAction("Index");
+            }
+
+            try
+            {
+                _cartService.RemoveFromCart(productId);
+                TempData["SuccessMessage"] = "Prodotto rimosso con successo!";
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Errore durante la rimozione: {ex.Message}");
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
         public IActionResult ClearCart()
         {
-            _cartService.ClearCart(); 
-            return RedirectToAction("Index"); 
+            _cartService.ClearCart();
+            return RedirectToAction("Index");
         }
     }
 }
