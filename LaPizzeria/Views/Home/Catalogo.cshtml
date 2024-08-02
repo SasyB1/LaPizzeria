@@ -5,8 +5,10 @@
 }
 
 <h1 class="text-center my-4">Catalogo</h1>
-
 <div class="container">
+    <div class="d-flex justify-content-end mb-3">
+        <a asp-action="Index" asp-controller="Cart" class="btn btn-secondary">Vai al carrello</a>
+    </div>
     <div class="row">
         @foreach (var item in Model)
         {

@@ -39,3 +39,16 @@
     </div>
 </div>
 
+@section Scripts {
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Ordine Inviato!',
+                text: '@TempData["SuccessMessage"]'
+            });
+        </script>
+    }
+
+}

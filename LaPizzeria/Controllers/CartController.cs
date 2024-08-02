@@ -72,6 +72,7 @@ namespace LaPizzeria.Controllers
             {
                 var orderId = await _cartService.SubmitOrderAsync(model, userId, cart);
                 _cartService.ClearCart();
+                TempData["SuccessMessage"] = "Ordine inviato con successo!";
                 return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)

@@ -89,25 +89,23 @@
 
 
 @section Scripts {
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <script>
-            document.getElementById('orderForm').addEventListener('submit', function (event) {
-                event.preventDefault();
-                const form = event.target;
-                Swal.fire({
-                    title: "Conferma Ordine",
-                    text: "Sei sicuro di voler inviare l'ordine?",
-                    icon: "warning",
-                    showCancelButton: true,
-                    confirmButtonText: "Sì, invia!",
-                    cancelButtonText: "Annulla"
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.submit();
-                    }
-                });
+    <script>
+        document.getElementById('orderForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const form = event.target;
+            Swal.fire({
+                title: "Conferma Ordine",
+                text: "Sei sicuro di voler inviare l'ordine?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sì, invia!",
+                cancelButtonText: "Annulla"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
             });
-        </script>
-    }
+        });
+    </script>
+ 
 }

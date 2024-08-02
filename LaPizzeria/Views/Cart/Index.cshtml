@@ -52,7 +52,10 @@
         </table>
 
         <div class="d-flex justify-content-between mt-3">
+           <div> 
+            <a asp-action="Catalogo" asp-controller="Home" class="btn btn-secondary">Torna al Catalogo</a>
             <a asp-action="Checkout" asp-controller="Cart" class="btn btn-primary">Procedi al Checkout</a>
+            </div>
             <form asp-action="ClearCart" asp-controller="Cart" method="post">
                 <button type="submit" class="btn btn-secondary">Svuota il Carrello</button>
             </form>
